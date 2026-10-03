@@ -10,4 +10,26 @@
         <maven.compiler.release>25</maven.compiler.release>
         <exec.mainClass>com.mycompany.ctrl.alt.elite.app.CtrlAltEliteApp</exec.mainClass>
     </properties>
+    <repositories>
+        <repository>
+            <id>central-mirror</id>
+            <name>Central Mirror</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <!-- Dependency for MySQL JDBC Driver -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.4.0</version>
+        </dependency>
+
+        <!-- Dependency for Java Dotenv Library -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+    </dependencies>
 </project>
