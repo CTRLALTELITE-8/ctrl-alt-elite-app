@@ -118,6 +118,23 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblRptReport = new javax.swing.JLabel();
         btnRptRefresh = new javax.swing.JButton();
         txtRptReport = new javax.swing.JComboBox<>();
+        pnlUsers = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblItems1 = new javax.swing.JTable();
+        lblUsrID = new javax.swing.JLabel();
+        txtUsrID = new javax.swing.JTextField();
+        lblUsrUsername = new javax.swing.JLabel();
+        txtUsrUsername = new javax.swing.JTextField();
+        lblUsrPassword = new javax.swing.JLabel();
+        btnUsrClear = new javax.swing.JButton();
+        btnUsrUpdate = new javax.swing.JButton();
+        btnUsrAdd = new javax.swing.JButton();
+        btnUsrDeactivate = new javax.swing.JButton();
+        lblUsrRole = new javax.swing.JLabel();
+        lblUsrStatus = new javax.swing.JLabel();
+        txtUsrPassword = new javax.swing.JPasswordField();
+        txtUsrRole = new javax.swing.JComboBox<>();
+        txtUsrStatus = new javax.swing.JComboBox<>();
         lblMainUser = new javax.swing.JLabel();
         btnLogout = new javax.swing.JButton();
 
@@ -347,7 +364,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTransactionsLayout.createSequentialGroup()
                         .addComponent(lblTrxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtTrxUser, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
+                        .addComponent(txtTrxUser, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTransactionsLayout.createSequentialGroup()
                         .addComponent(lblTrxType, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -433,7 +450,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
             .addGroup(pnlAlertsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 201, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 221, Short.MAX_VALUE)
                 .addComponent(btnAlrRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -500,7 +517,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(pnlCategoriesLayout.createSequentialGroup()
                         .addComponent(lblCtgName, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCtgName, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
+                        .addComponent(txtCtgName, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCategoriesLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(pnlCategoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -577,7 +594,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(pnlReportingLayout.createSequentialGroup()
                         .addComponent(lblRptReport, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtRptReport, 0, 214, Short.MAX_VALUE))
+                        .addComponent(txtRptReport, 0, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlReportingLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnRptRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -599,6 +616,138 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         );
 
         paneTabs.addTab("Reporting", pnlReporting);
+
+        pnlUsers.setBackground(new java.awt.Color(204, 204, 204));
+        pnlUsers.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        tblItems1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane8.setViewportView(tblItems1);
+
+        lblUsrID.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrID.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrID.setText("User ID:");
+
+        txtUsrID.setEditable(false);
+
+        lblUsrUsername.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrUsername.setText("Username:");
+
+        lblUsrPassword.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrPassword.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrPassword.setText("Password:");
+
+        btnUsrClear.setText("Clear");
+
+        btnUsrUpdate.setText("Update");
+
+        btnUsrAdd.setText("Add");
+        btnUsrAdd.addActionListener(this::btnUsrAddActionPerformed);
+
+        btnUsrDeactivate.setText("Deactivate");
+
+        lblUsrRole.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrRole.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrRole.setText("Role:");
+
+        lblUsrStatus.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrStatus.setText("Status:");
+
+        txtUsrRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "staff", "admin" }));
+
+        txtUsrStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "0" }));
+
+        javax.swing.GroupLayout pnlUsersLayout = new javax.swing.GroupLayout(pnlUsers);
+        pnlUsers.setLayout(pnlUsersLayout);
+        pnlUsersLayout.setHorizontalGroup(
+            pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUsersLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrID))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrUsername))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrPassword))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                        .addGap(0, 94, Short.MAX_VALUE)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                                .addComponent(btnUsrDeactivate, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnUsrClear, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                                .addComponent(btnUsrAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnUsrUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlUsersLayout.setVerticalGroup(
+            pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUsersLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnUsrUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUsrAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnUsrClear, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUsrDeactivate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
+        );
+
+        paneTabs.addTab("User Management", pnlUsers);
 
         lblMainUser.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblMainUser.setForeground(new java.awt.Color(51, 51, 51));
@@ -653,6 +802,10 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private void btnCtgAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCtgAddActionPerformed
         perform(() -> backend.addCategory(txtCtgName.getText()), "Category added.");
     }//GEN-LAST:event_btnCtgAddActionPerformed
+
+    private void btnUsrAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrAddActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUsrAddActionPerformed
 
     // Connect backend operations to the existing interface.
     // NetBeans-generated initComponents() and .form layouts above are unchanged.
@@ -897,12 +1050,17 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnTrxClear;
     private javax.swing.JButton btnTrxDeactivate;
     private javax.swing.JButton btnTrxUpdate;
+    private javax.swing.JButton btnUsrAdd;
+    private javax.swing.JButton btnUsrClear;
+    private javax.swing.JButton btnUsrDeactivate;
+    private javax.swing.JButton btnUsrUpdate;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JLabel lblCtgID;
     private javax.swing.JLabel lblCtgName;
     private javax.swing.JLabel lblItmCategory;
@@ -919,15 +1077,22 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblTrxQuantity;
     private javax.swing.JLabel lblTrxType;
     private javax.swing.JLabel lblTrxUser;
+    private javax.swing.JLabel lblUsrID;
+    private javax.swing.JLabel lblUsrPassword;
+    private javax.swing.JLabel lblUsrRole;
+    private javax.swing.JLabel lblUsrStatus;
+    private javax.swing.JLabel lblUsrUsername;
     private javax.swing.JTabbedPane paneTabs;
     private javax.swing.JPanel pnlAlerts;
     private javax.swing.JPanel pnlCategories;
     private javax.swing.JPanel pnlItems;
     private javax.swing.JPanel pnlReporting;
     private javax.swing.JPanel pnlTransactions;
+    private javax.swing.JPanel pnlUsers;
     private javax.swing.JTable tblAlerts;
     private javax.swing.JTable tblCategories;
     private javax.swing.JTable tblItems;
+    private javax.swing.JTable tblItems1;
     private javax.swing.JTable tblReporting;
     private javax.swing.JTable tblTransactions;
     private javax.swing.JTextField txtCtgID;
@@ -944,5 +1109,10 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JSpinner txtTrxQuantity;
     private javax.swing.JComboBox<String> txtTrxType;
     private javax.swing.JTextField txtTrxUser;
+    private javax.swing.JTextField txtUsrID;
+    private javax.swing.JPasswordField txtUsrPassword;
+    private javax.swing.JComboBox<String> txtUsrRole;
+    private javax.swing.JComboBox<String> txtUsrStatus;
+    private javax.swing.JTextField txtUsrUsername;
     // End of variables declaration//GEN-END:variables
 }
