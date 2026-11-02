@@ -1,4 +1,4 @@
-# CTRL ALT ELITE â€” Stock Inventory Management System
+# ”CTRL ALT ELITE” Stock Inventory Management System
 
 ## About the Project
 
