@@ -36,7 +36,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         if (user != null) {
             lblMainUser.setText(user.username() + " / " + user.role());
             txtTrxUser.setText(user.username());
-            // Admin manages catalogue; staff can record stock and view reports.
+            // Staff can access only Transactions and Alerts.
             boolean admin = "admin".equalsIgnoreCase(user.role());
             btnItmAdd.setEnabled(admin);
             btnItmUpdate.setEnabled(admin);
@@ -45,6 +45,12 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
             btnCtgUpdate.setEnabled(admin);
             btnCtgDeactivate.setEnabled(admin);
             btnTrxAdd.setEnabled(true);
+            if (!admin) {
+                for (int i = paneTabs.getTabCount() - 1; i >= 0; i--) {
+                    java.awt.Component tab = paneTabs.getComponentAt(i);
+                    if (tab != pnlTransactions && tab != pnlAlerts) paneTabs.removeTabAt(i);
+                }
+            }
             loadTables();
         }
     }
@@ -331,7 +337,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblTrxQuantity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTrxQuantity.setText("Quantity:");
 
-        btnTrxAdd.setText("Add");
+        btnTrxAdd.setText("Post");
         btnTrxAdd.addActionListener(this::btnTrxAddActionPerformed);
 
         btnTrxUpdate.setText("Update");
@@ -794,7 +800,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnItmAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnItmAddActionPerformed
-        perform(() -> backend.addItem(txtItmCode.getText(), txtItemDescription.getText(),
+        perform(() -> backend.addItem(signedIn.id(), txtItmCode.getText(), txtItemDescription.getText(),
                 selectedCategoryId(), ((Number) txtItmMinStock.getValue()).intValue()), "Item added.");
     }//GEN-LAST:event_btnItmAddActionPerformed
 
@@ -805,11 +811,20 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTrxAddActionPerformed
 
     private void btnCtgAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCtgAddActionPerformed
-        perform(() -> backend.addCategory(txtCtgName.getText()), "Category added.");
+        perform(() -> backend.addCategory(signedIn.id(), txtCtgName.getText()), "Category added.");
     }//GEN-LAST:event_btnCtgAddActionPerformed
 
     private void btnUsrAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrAddActionPerformed
-        // TODO add your handling code here:
+        if (!isAdmin()) return;
+        char[] password = txtUsrPassword.getPassword();
+        try {
+            backend.addUser(signedIn.id(), txtUsrUsername.getText(), password,
+                    (String) txtUsrRole.getSelectedItem(), "1".equals(txtUsrStatus.getSelectedItem()));
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User added. Give the password to the user privately.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
+        finally { java.util.Arrays.fill(password, '\0'); }
     }//GEN-LAST:event_btnUsrAddActionPerformed
 
     private void txtUsrPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsrPasswordActionPerformed
@@ -817,15 +832,30 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUsrPasswordActionPerformed
 
     private void btnUsrUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrUpdateActionPerformed
-        // TODO add your handling code here:
+        if (!isAdmin()) return;
+        char[] password = txtUsrPassword.getPassword();
+        try {
+            backend.updateUser(signedIn.id(), selectedUserId(), txtUsrUsername.getText(), password,
+                    (String) txtUsrRole.getSelectedItem(), "1".equals(txtUsrStatus.getSelectedItem()));
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User updated. If changed, share the new password privately.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
+        finally { java.util.Arrays.fill(password, '\0'); }
     }//GEN-LAST:event_btnUsrUpdateActionPerformed
 
     private void btnUsrDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrDeactivateActionPerformed
-        // TODO add your handling code here:
+        if (!isAdmin() || !confirm("Deactivate selected user?")) return;
+        try {
+            backend.deactivateUser(signedIn.id(), selectedUserId());
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User deactivated.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
     }//GEN-LAST:event_btnUsrDeactivateActionPerformed
 
     private void btnUsrClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrClearActionPerformed
-        // TODO add your handling code here:
+        clearUser();
     }//GEN-LAST:event_btnUsrClearActionPerformed
 
     // Connect backend operations to the existing interface.
@@ -841,19 +871,19 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         txtTrxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"IN", "OUT"}));
         txtRptReport.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Inventory", "Transactions"}));
 
-        btnItmUpdate.addActionListener(e -> perform(() -> backend.updateItem(itemRecordId(),
+        btnItmUpdate.addActionListener(e -> perform(() -> backend.updateItem(signedIn.id(), itemRecordId(),
                 txtItmCode.getText(), txtItemDescription.getText(), selectedCategoryId(),
                 ((Number) txtItmMinStock.getValue()).intValue()), "Item updated."));
         btnItmDeactivate.addActionListener(e -> {
             if (confirm("Deactivate this stock item?"))
-                perform(() -> backend.deactivateItem(itemRecordId()), "Item deactivated.");
+                perform(() -> backend.deactivateItem(signedIn.id(), itemRecordId()), "Item deactivated.");
         });
         btnItemClear.addActionListener(e -> clearItem());
-        btnCtgUpdate.addActionListener(e -> perform(() -> backend.updateCategory(categoryRecordId(),
+        btnCtgUpdate.addActionListener(e -> perform(() -> backend.updateCategory(signedIn.id(), categoryRecordId(),
                 txtCtgName.getText()), "Category updated."));
         btnCtgDeactivate.addActionListener(e -> {
             if (confirm("Delete this category? Only unused categories can be deleted."))
-                perform(() -> backend.deleteCategory(categoryRecordId()), "Category deleted.");
+                perform(() -> backend.deleteCategory(signedIn.id(), categoryRecordId()), "Category deleted.");
         });
         btnCtgClear.addActionListener(e -> clearCategory());
         btnTrxClear.addActionListener(e -> {
@@ -871,6 +901,9 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         });
         tblItems.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblItems.getSelectedRow() >= 0) selectItemRow();
+        });
+        tblItems1.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblItems1.getSelectedRow() >= 0) selectUserRow();
         });
         tblCategories.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblCategories.getSelectedRow() >= 0) selectCategoryRow();
@@ -963,10 +996,44 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     backend.transactions());
             fillTable(tblAlerts, new String[]{"ID", "Code", "Description", "Category", "Quantity",
                     "Min Level"}, backend.lowStock());
-            loadReport();
+            if (isAdmin()) loadUsers();
+            if (isAdmin()) loadReport();
         } catch (java.sql.SQLException ex) {
             showError("Could not load inventory. Check your .env and MySQL setup.\n" + ex.getMessage());
         }
+    }
+
+    private boolean isAdmin() {
+        return signedIn != null && "admin".equalsIgnoreCase(signedIn.role());
+    }
+
+    private void loadUsers() throws java.sql.SQLException {
+        if (isAdmin()) fillTable(tblItems1,
+                new String[]{"ID", "Username", "Role", "Active"}, backend.users(signedIn.id()));
+    }
+
+    private int selectedUserId() {
+        try { return Integer.parseInt(txtUsrID.getText().trim()); }
+        catch (NumberFormatException ex) { throw new IllegalArgumentException("Select a user from the table."); }
+    }
+
+    private void selectUserRow() {
+        int row = tblItems1.convertRowIndexToModel(tblItems1.getSelectedRow());
+        javax.swing.table.TableModel m = tblItems1.getModel();
+        txtUsrID.setText(m.getValueAt(row, 0).toString());
+        txtUsrUsername.setText(m.getValueAt(row, 1).toString());
+        txtUsrRole.setSelectedItem(m.getValueAt(row, 2).toString());
+        txtUsrStatus.setSelectedItem(m.getValueAt(row, 3).toString());
+        txtUsrPassword.setText("");
+    }
+
+    private void clearUser() {
+        txtUsrID.setText("");
+        txtUsrUsername.setText("");
+        txtUsrPassword.setText("");
+        txtUsrRole.setSelectedItem("staff");
+        txtUsrStatus.setSelectedItem("1");
+        tblItems1.clearSelection();
     }
 
     private java.util.List<Object[]> categoryRows(java.util.List<BackendService.Choice> categories) {
