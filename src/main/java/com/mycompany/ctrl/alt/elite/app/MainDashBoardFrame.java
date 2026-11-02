@@ -648,13 +648,16 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblUsrPassword.setText("Password:");
 
         btnUsrClear.setText("Clear");
+        btnUsrClear.addActionListener(this::btnUsrClearActionPerformed);
 
         btnUsrUpdate.setText("Update");
+        btnUsrUpdate.addActionListener(this::btnUsrUpdateActionPerformed);
 
         btnUsrAdd.setText("Add");
         btnUsrAdd.addActionListener(this::btnUsrAddActionPerformed);
 
         btnUsrDeactivate.setText("Deactivate");
+        btnUsrDeactivate.addActionListener(this::btnUsrDeactivateActionPerformed);
 
         lblUsrRole.setBackground(new java.awt.Color(255, 255, 255));
         lblUsrRole.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -663,6 +666,8 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblUsrStatus.setBackground(new java.awt.Color(255, 255, 255));
         lblUsrStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblUsrStatus.setText("Status:");
+
+        txtUsrPassword.addActionListener(this::txtUsrPasswordActionPerformed);
 
         txtUsrRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "staff", "admin" }));
 
@@ -806,6 +811,22 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private void btnUsrAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrAddActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnUsrAddActionPerformed
+
+    private void txtUsrPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsrPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUsrPasswordActionPerformed
+
+    private void btnUsrUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrUpdateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUsrUpdateActionPerformed
+
+    private void btnUsrDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrDeactivateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUsrDeactivateActionPerformed
+
+    private void btnUsrClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrClearActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUsrClearActionPerformed
 
     // Connect backend operations to the existing interface.
     // NetBeans-generated initComponents() and .form layouts above are unchanged.
