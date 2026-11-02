@@ -10,6 +10,8 @@ package com.mycompany.ctrl.alt.elite.app;
  */
 public class LoginFrame extends javax.swing.JFrame {
     
+    private final BackendService backend = new BackendService();
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LoginFrame.class.getName());
 
     /**
@@ -126,12 +128,32 @@ public class LoginFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        // TODO add your handling code here:
+        signIn();
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void txtUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsernameActionPerformed
-        // TODO add your handling code here:
+        signIn();
     }//GEN-LAST:event_txtUsernameActionPerformed
+
+    private void signIn() {
+        char[] password = txtPassword.getPassword();
+        try {
+            BackendService.User user = backend.login(txtUsername.getText(), password);
+            if (user == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Incorrect username or password.");
+                return;
+            }
+            new MainDashBoardFrame(user).setVisible(true);
+            dispose();
+        } catch (java.sql.SQLException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Cannot connect to the database: " + ex.getMessage(),
+                    "Login error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        } finally {
+            java.util.Arrays.fill(password, '\0');
+            txtPassword.setText("");
+        }
+    }
 
     /**
      * @param args the command line arguments

@@ -10,6 +10,11 @@ package com.mycompany.ctrl.alt.elite.app;
  */
 public class MainDashBoardFrame extends javax.swing.JFrame {
     
+    private final BackendService backend = new BackendService();
+    private BackendService.User signedIn;
+    private final java.util.Map<String, Integer> categoryIds = new java.util.LinkedHashMap<>();
+    private final java.util.Map<String, Integer> itemIds = new java.util.LinkedHashMap<>();
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainDashBoardFrame.class.getName());
 
     /**
@@ -22,6 +27,26 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
             System.out.println("Icon image could not be loaded: " + e.getMessage());
         }
         initComponents();
+        prepareBackendUi();
+    }
+
+    public MainDashBoardFrame(BackendService.User user) {
+        this();
+        this.signedIn = user;
+        if (user != null) {
+            lblMainUser.setText(user.username() + " / " + user.role());
+            txtTrxUser.setText(user.username());
+            // Admin manages catalogue; staff can record stock and view reports.
+            boolean admin = "admin".equalsIgnoreCase(user.role());
+            btnItmAdd.setEnabled(admin);
+            btnItmUpdate.setEnabled(admin);
+            btnItmDeactivate.setEnabled(admin);
+            btnCtgAdd.setEnabled(admin);
+            btnCtgUpdate.setEnabled(admin);
+            btnCtgDeactivate.setEnabled(admin);
+            btnTrxAdd.setEnabled(true);
+            loadTables();
+        }
     }
 
     /**
@@ -615,16 +640,221 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnItmAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnItmAddActionPerformed
-        // TODO add your handling code here:
+        perform(() -> backend.addItem(txtItmCode.getText(), txtItemDescription.getText(),
+                selectedCategoryId(), ((Number) txtItmMinStock.getValue()).intValue()), "Item added.");
     }//GEN-LAST:event_btnItmAddActionPerformed
 
     private void btnTrxAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrxAddActionPerformed
-        // TODO add your handling code here:
+        perform(() -> backend.recordStock(selectedItemId(), signedIn.id(),
+                (String) txtTrxType.getSelectedItem(), ((Number) txtTrxQuantity.getValue()).intValue()),
+                "Stock transaction saved.");
     }//GEN-LAST:event_btnTrxAddActionPerformed
 
     private void btnCtgAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCtgAddActionPerformed
-        // TODO add your handling code here:
+        perform(() -> backend.addCategory(txtCtgName.getText()), "Category added.");
     }//GEN-LAST:event_btnCtgAddActionPerformed
+
+    // Connect backend operations to the existing interface.
+    // NetBeans-generated initComponents() and .form layouts above are unchanged.
+    private void prepareBackendUi() {
+        txtItmQuantity.setEditable(false); // Stock changes only through IN/OUT transactions.
+        txtItmQuantity.setToolTipText("Use Transactions to change the stock quantity.");
+        btnTrxUpdate.setEnabled(false); // Stock history must remain unchanged.
+        btnTrxDeactivate.setEnabled(false);
+        btnTrxUpdate.setToolTipText("Transactions are permanent audit records.");
+        btnTrxDeactivate.setToolTipText("Transactions are permanent audit records.");
+        btnCtgDeactivate.setText("Delete"); // CATEGORY has no active column.
+        txtTrxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"IN", "OUT"}));
+        txtRptReport.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Inventory", "Transactions"}));
+
+        btnItmUpdate.addActionListener(e -> perform(() -> backend.updateItem(itemRecordId(),
+                txtItmCode.getText(), txtItemDescription.getText(), selectedCategoryId(),
+                ((Number) txtItmMinStock.getValue()).intValue()), "Item updated."));
+        btnItmDeactivate.addActionListener(e -> {
+            if (confirm("Deactivate this stock item?"))
+                perform(() -> backend.deactivateItem(itemRecordId()), "Item deactivated.");
+        });
+        btnItemClear.addActionListener(e -> clearItem());
+        btnCtgUpdate.addActionListener(e -> perform(() -> backend.updateCategory(categoryRecordId(),
+                txtCtgName.getText()), "Category updated."));
+        btnCtgDeactivate.addActionListener(e -> {
+            if (confirm("Delete this category? Only unused categories can be deleted."))
+                perform(() -> backend.deleteCategory(categoryRecordId()), "Category deleted.");
+        });
+        btnCtgClear.addActionListener(e -> clearCategory());
+        btnTrxClear.addActionListener(e -> {
+            txtTrxQuantity.setValue(1);
+            txtTrxType.setSelectedItem("IN");
+        });
+        btnAlrRefresh.addActionListener(e -> loadTables());
+        btnRptRefresh.addActionListener(e -> loadTables());
+        txtRptReport.addActionListener(e -> {
+            if (signedIn != null) loadReport();
+        });
+        btnLogout.addActionListener(e -> {
+            dispose();
+            new LoginFrame().setVisible(true);
+        });
+        tblItems.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblItems.getSelectedRow() >= 0) selectItemRow();
+        });
+        tblCategories.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblCategories.getSelectedRow() >= 0) selectCategoryRow();
+        });
+        // The no-argument constructor is a preview only; the LoginFrame must create a session.
+        if (signedIn == null) {
+            btnItmAdd.setEnabled(false);
+            btnItmUpdate.setEnabled(false);
+            btnItmDeactivate.setEnabled(false);
+            btnCtgAdd.setEnabled(false);
+            btnCtgUpdate.setEnabled(false);
+            btnCtgDeactivate.setEnabled(false);
+            btnTrxAdd.setEnabled(false);
+        }
+    }
+
+    private interface DatabaseAction { void run() throws java.sql.SQLException; }
+
+    private void perform(DatabaseAction action, String confirmation) {
+        if (signedIn == null) {
+            showError("Please log in before changing inventory data.");
+            return;
+        }
+        try {
+            action.run();
+            loadTables();
+            clearItem();
+            clearCategory();
+            javax.swing.JOptionPane.showMessageDialog(this, confirmation);
+        } catch (java.sql.SQLException | IllegalArgumentException | NullPointerException ex) {
+            showError(ex.getMessage());
+        }
+    }
+
+    private void showError(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message,
+                "Inventory system", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
+    private boolean confirm(String question) {
+        return javax.swing.JOptionPane.showConfirmDialog(this, question, "Confirm",
+                javax.swing.JOptionPane.YES_NO_OPTION) == javax.swing.JOptionPane.YES_OPTION;
+    }
+
+    private int selectedCategoryId() {
+        Integer id = categoryIds.get((String) txtItmCategory.getSelectedItem());
+        if (id == null) throw new IllegalArgumentException("Select a valid category.");
+        return id;
+    }
+
+    private int selectedItemId() {
+        Integer id = itemIds.get((String) txtTrxItem.getSelectedItem());
+        if (id == null) throw new IllegalArgumentException("Select a valid stock item.");
+        return id;
+    }
+
+    private int itemRecordId() {
+        try { return Integer.parseInt(txtItmID.getText().trim()); }
+        catch (NumberFormatException ex) { throw new IllegalArgumentException("Select an item from the table."); }
+    }
+
+    private int categoryRecordId() {
+        try { return Integer.parseInt(txtCtgID.getText().trim()); }
+        catch (NumberFormatException ex) { throw new IllegalArgumentException("Select a category from the table."); }
+    }
+
+    private void loadTables() {
+        if (signedIn == null) return;
+        try {
+            Object categorySelection = txtItmCategory.getSelectedItem();
+            Object itemSelection = txtTrxItem.getSelectedItem();
+            java.util.List<BackendService.Choice> categories = backend.categories();
+            categoryIds.clear();
+            for (BackendService.Choice c : categories) categoryIds.put(c.name(), c.id());
+            txtItmCategory.setModel(new javax.swing.DefaultComboBoxModel<>(
+                    categoryIds.keySet().toArray(new String[0])));
+            txtItmCategory.setSelectedItem(categorySelection);
+
+            java.util.List<BackendService.Choice> items = backend.activeItems();
+            itemIds.clear();
+            for (BackendService.Choice c : items) itemIds.put(c.name(), c.id());
+            txtTrxItem.setModel(new javax.swing.DefaultComboBoxModel<>(
+                    itemIds.keySet().toArray(new String[0])));
+            txtTrxItem.setSelectedItem(itemSelection);
+
+            fillTable(tblCategories, new String[]{"ID", "Category"}, categoryRows(categories));
+            fillTable(tblItems, new String[]{"ID", "Code", "Description", "Category", "Quantity",
+                    "Min Level", "Active"}, backend.inventory());
+            fillTable(tblTransactions, new String[]{"ID", "Item", "Type", "Quantity", "User", "Date"},
+                    backend.transactions());
+            fillTable(tblAlerts, new String[]{"ID", "Code", "Description", "Category", "Quantity",
+                    "Min Level"}, backend.lowStock());
+            loadReport();
+        } catch (java.sql.SQLException ex) {
+            showError("Could not load inventory. Check your .env and MySQL setup.\n" + ex.getMessage());
+        }
+    }
+
+    private java.util.List<Object[]> categoryRows(java.util.List<BackendService.Choice> categories) {
+        java.util.List<Object[]> result = new java.util.ArrayList<>();
+        for (BackendService.Choice c : categories) result.add(new Object[]{c.id(), c.name()});
+        return result;
+    }
+
+    private void loadReport() {
+        if (signedIn == null) return;
+        try {
+            if ("Transactions".equals(txtRptReport.getSelectedItem())) {
+                fillTable(tblReporting, new String[]{"ID", "Item", "Type", "Quantity", "User", "Date"},
+                        backend.transactions());
+            } else {
+                fillTable(tblReporting, new String[]{"ID", "Code", "Description", "Category",
+                        "Quantity", "Min Level", "Active"}, backend.inventory());
+            }
+        } catch (java.sql.SQLException ex) {
+            showError(ex.getMessage());
+        }
+    }
+
+    private void fillTable(javax.swing.JTable table, String[] headers, java.util.List<Object[]> data) {
+        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(headers, 0) {
+            @Override public boolean isCellEditable(int row, int column) { return false; }
+        };
+        for (Object[] row : data) model.addRow(row);
+        table.setModel(model);
+    }
+
+    private void selectItemRow() {
+        int row = tblItems.convertRowIndexToModel(tblItems.getSelectedRow());
+        javax.swing.table.TableModel m = tblItems.getModel();
+        txtItmID.setText(m.getValueAt(row, 0).toString());
+        txtItmCode.setText(m.getValueAt(row, 1).toString());
+        txtItemDescription.setText(m.getValueAt(row, 2).toString());
+        txtItmCategory.setSelectedItem(m.getValueAt(row, 3).toString());
+        txtItmQuantity.setText(m.getValueAt(row, 4).toString());
+        txtItmMinStock.setValue(((Number)m.getValueAt(row, 5)).intValue());
+    }
+
+    private void selectCategoryRow() {
+        int row = tblCategories.convertRowIndexToModel(tblCategories.getSelectedRow());
+        txtCtgID.setText(tblCategories.getModel().getValueAt(row, 0).toString());
+        txtCtgName.setText(tblCategories.getModel().getValueAt(row, 1).toString());
+    }
+
+    private void clearItem() {
+        txtItmID.setText("");
+        txtItmCode.setText("");
+        txtItemDescription.setText("");
+        txtItmQuantity.setText("0");
+        txtItmMinStock.setValue(0);
+        tblItems.clearSelection();
+    }
+
+    private void clearCategory() {
+        txtCtgID.setText("");
+        txtCtgName.setText("");
+        tblCategories.clearSelection();
+    }
 
     /**
      * @param args the command line arguments
@@ -648,7 +878,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MainDashBoardFrame().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
