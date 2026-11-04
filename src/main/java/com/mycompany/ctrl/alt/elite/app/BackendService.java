@@ -55,6 +55,106 @@ public class BackendService {
         }
     }
 
+    // User management: permissions are verified against the database on every request.
+    private void requireAdmin(Connection con, int actorId) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT role FROM USER WHERE user_id=? AND active=TRUE")) {
+            ps.setInt(1, actorId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next() || !"admin".equalsIgnoreCase(rs.getString(1)))
+                    throw new SQLException("Administrator access required.");
+            }
+        }
+    }
+
+    public List<Object[]> users(int actorId) throws SQLException {
+        List<Object[]> result = new ArrayList<>();
+        try (Connection con = connect()) {
+            requireAdmin(con, actorId);
+            try (PreparedStatement ps = con.prepareStatement(
+                    "SELECT user_id, username, role, active FROM USER ORDER BY user_id");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(new Object[]{rs.getInt(1), rs.getString(2),
+                        rs.getString(3), rs.getBoolean(4) ? "1" : "0"});
+            }
+        }
+        return result;
+    }
+
+    private static String validatedRole(String role) {
+        if (!"admin".equalsIgnoreCase(role) && !"staff".equalsIgnoreCase(role))
+            throw new IllegalArgumentException("Role must be admin or staff.");
+        return role.toLowerCase(java.util.Locale.ROOT);
+    }
+
+    private static String hashPassword(char[] password) {
+        if (password == null || password.length < 8)
+            throw new IllegalArgumentException("Password must contain at least 8 characters.");
+        return BCrypt.hashpw(new String(password), BCrypt.gensalt(12));
+    }
+
+    public void addUser(int actorId, String username, char[] password, String role, boolean active)
+            throws SQLException {
+        requireText(username, "Username");
+        String validated = validatedRole(role);
+        String hash = hashPassword(password);
+        try (Connection con = connect()) {
+            requireAdmin(con, actorId);
+            try (PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO USER (username,password,role,active) VALUES (?,?,?,?)")) {
+                ps.setString(1, username.trim());
+                ps.setString(2, hash);
+                ps.setString(3, validated);
+                ps.setBoolean(4, active);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    public void updateUser(int actorId, int targetId, String username, char[] newPassword,
+                           String role, boolean active) throws SQLException {
+        requireId(targetId);
+        requireText(username, "Username");
+        String validated = validatedRole(role);
+        if (actorId == targetId && (!active || !"admin".equals(validated)))
+            throw new IllegalArgumentException("You cannot disable or demote your own admin account.");
+        try (Connection con = connect()) {
+            requireAdmin(con, actorId);
+            boolean changingPassword = newPassword != null && newPassword.length > 0;
+            String sql = changingPassword
+                    ? "UPDATE USER SET username=?, role=?, active=?, password=? WHERE user_id=?"
+                    : "UPDATE USER SET username=?, role=?, active=? WHERE user_id=?";
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, username.trim());
+                ps.setString(2, validated);
+                ps.setBoolean(3, active);
+                if (changingPassword) {
+                    ps.setString(4, hashPassword(newPassword));
+                    ps.setInt(5, targetId);
+                } else ps.setInt(4, targetId);
+                if (ps.executeUpdate() == 0) throw new SQLException("User was not found.");
+            }
+        }
+    }
+
+    public void deactivateUser(int actorId, int targetId) throws SQLException {
+        requireId(targetId);
+        if (actorId == targetId)
+            throw new IllegalArgumentException("You cannot deactivate your own account.");
+        try (Connection con = connect()) {
+            requireAdmin(con, actorId);
+            try (PreparedStatement ps = con.prepareStatement(
+                    "UPDATE USER SET active=FALSE WHERE user_id=?")) {
+                ps.setInt(1, targetId);
+                if (ps.executeUpdate() == 0) throw new SQLException("User was not found.");
+            }
+        }
+    }
+
+    private void assertAdmin(int actorId) throws SQLException {
+        try (Connection con = connect()) { requireAdmin(con, actorId); }
+    }
+
     // Categories
     public List<Choice> categories() throws SQLException {
         List<Choice> result = new ArrayList<>();
@@ -67,17 +167,20 @@ public class BackendService {
         return result;
     }
 
-    public void addCategory(String name) throws SQLException {
+    public void addCategory(int actorId, String name) throws SQLException {
+        assertAdmin(actorId);
         requireText(name, "Category name");
         runUpdate("INSERT INTO CATEGORY (category_name) VALUES (?)", name.trim());
     }
 
-    public void updateCategory(int id, String name) throws SQLException {
+    public void updateCategory(int actorId, int id, String name) throws SQLException {
+        assertAdmin(actorId);
         requireId(id); requireText(name, "Category name");
         runUpdate("UPDATE CATEGORY SET category_name=? WHERE category_id=?", name.trim(), id);
     }
 
-    public void deleteCategory(int id) throws SQLException {
+    public void deleteCategory(int actorId, int id) throws SQLException {
+        assertAdmin(actorId);
         requireId(id);
         runUpdate("DELETE FROM CATEGORY WHERE category_id=?", id);
     }
@@ -102,7 +205,8 @@ public class BackendService {
         return result;
     }
 
-    public void addItem(String code, String description, int categoryId, int minStock) throws SQLException {
+    public void addItem(int actorId, String code, String description, int categoryId, int minStock) throws SQLException {
+        assertAdmin(actorId);
         requireText(code, "Item code"); requireText(description, "Description");
         requireId(categoryId);
         if (minStock < 0) throw new IllegalArgumentException("Minimum stock cannot be negative.");
@@ -111,8 +215,9 @@ public class BackendService {
                 + "VALUES (?, ?, ?, 0, ?)", code.trim(), description.trim(), categoryId, minStock);
     }
 
-    public void updateItem(int id, String code, String description, int categoryId, int minStock)
+    public void updateItem(int actorId, int id, String code, String description, int categoryId, int minStock)
             throws SQLException {
+        assertAdmin(actorId);
         requireId(id); requireText(code, "Item code"); requireText(description, "Description");
         requireId(categoryId);
         if (minStock < 0) throw new IllegalArgumentException("Minimum stock cannot be negative.");
@@ -120,7 +225,8 @@ public class BackendService {
                 + "WHERE item_id=? AND active=TRUE", code.trim(), description.trim(), categoryId, minStock, id);
     }
 
-    public void deactivateItem(int id) throws SQLException {
+    public void deactivateItem(int actorId, int id) throws SQLException {
+        assertAdmin(actorId);
         requireId(id);
         runUpdate("UPDATE ITEM SET active=FALSE WHERE item_id=?", id);
     }

@@ -36,7 +36,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         if (user != null) {
             lblMainUser.setText(user.username() + " / " + user.role());
             txtTrxUser.setText(user.username());
-            // Admin manages catalogue; staff can record stock and view reports.
+            // Staff can access only Transactions and Alerts.
             boolean admin = "admin".equalsIgnoreCase(user.role());
             btnItmAdd.setEnabled(admin);
             btnItmUpdate.setEnabled(admin);
@@ -45,6 +45,12 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
             btnCtgUpdate.setEnabled(admin);
             btnCtgDeactivate.setEnabled(admin);
             btnTrxAdd.setEnabled(true);
+            if (!admin) {
+                for (int i = paneTabs.getTabCount() - 1; i >= 0; i--) {
+                    java.awt.Component tab = paneTabs.getComponentAt(i);
+                    if (tab != pnlTransactions && tab != pnlAlerts) paneTabs.removeTabAt(i);
+                }
+            }
             loadTables();
         }
     }
@@ -118,6 +124,23 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblRptReport = new javax.swing.JLabel();
         btnRptRefresh = new javax.swing.JButton();
         txtRptReport = new javax.swing.JComboBox<>();
+        pnlUsers = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblItems1 = new javax.swing.JTable();
+        lblUsrID = new javax.swing.JLabel();
+        txtUsrID = new javax.swing.JTextField();
+        lblUsrUsername = new javax.swing.JLabel();
+        txtUsrUsername = new javax.swing.JTextField();
+        lblUsrPassword = new javax.swing.JLabel();
+        btnUsrClear = new javax.swing.JButton();
+        btnUsrUpdate = new javax.swing.JButton();
+        btnUsrAdd = new javax.swing.JButton();
+        btnUsrDeactivate = new javax.swing.JButton();
+        lblUsrRole = new javax.swing.JLabel();
+        lblUsrStatus = new javax.swing.JLabel();
+        txtUsrPassword = new javax.swing.JPasswordField();
+        txtUsrRole = new javax.swing.JComboBox<>();
+        txtUsrStatus = new javax.swing.JComboBox<>();
         lblMainUser = new javax.swing.JLabel();
         btnLogout = new javax.swing.JButton();
 
@@ -314,7 +337,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblTrxQuantity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTrxQuantity.setText("Quantity:");
 
-        btnTrxAdd.setText("Add");
+        btnTrxAdd.setText("Post");
         btnTrxAdd.addActionListener(this::btnTrxAddActionPerformed);
 
         btnTrxUpdate.setText("Update");
@@ -347,7 +370,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTransactionsLayout.createSequentialGroup()
                         .addComponent(lblTrxUser, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtTrxUser, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
+                        .addComponent(txtTrxUser, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTransactionsLayout.createSequentialGroup()
                         .addComponent(lblTrxType, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -433,7 +456,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
             .addGroup(pnlAlertsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 201, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 221, Short.MAX_VALUE)
                 .addComponent(btnAlrRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -500,7 +523,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(pnlCategoriesLayout.createSequentialGroup()
                         .addComponent(lblCtgName, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCtgName, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
+                        .addComponent(txtCtgName, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCategoriesLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(pnlCategoriesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -577,7 +600,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     .addGroup(pnlReportingLayout.createSequentialGroup()
                         .addComponent(lblRptReport, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtRptReport, 0, 214, Short.MAX_VALUE))
+                        .addComponent(txtRptReport, 0, 234, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlReportingLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnRptRefresh, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -599,6 +622,143 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         );
 
         paneTabs.addTab("Reporting", pnlReporting);
+
+        pnlUsers.setBackground(new java.awt.Color(204, 204, 204));
+        pnlUsers.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        tblItems1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane8.setViewportView(tblItems1);
+
+        lblUsrID.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrID.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrID.setText("User ID:");
+
+        txtUsrID.setEditable(false);
+
+        lblUsrUsername.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrUsername.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrUsername.setText("Username:");
+
+        lblUsrPassword.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrPassword.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrPassword.setText("Password:");
+
+        btnUsrClear.setText("Clear");
+        btnUsrClear.addActionListener(this::btnUsrClearActionPerformed);
+
+        btnUsrUpdate.setText("Update");
+        btnUsrUpdate.addActionListener(this::btnUsrUpdateActionPerformed);
+
+        btnUsrAdd.setText("Add");
+        btnUsrAdd.addActionListener(this::btnUsrAddActionPerformed);
+
+        btnUsrDeactivate.setText("Deactivate");
+        btnUsrDeactivate.addActionListener(this::btnUsrDeactivateActionPerformed);
+
+        lblUsrRole.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrRole.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrRole.setText("Role:");
+
+        lblUsrStatus.setBackground(new java.awt.Color(255, 255, 255));
+        lblUsrStatus.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsrStatus.setText("Status:");
+
+        txtUsrPassword.addActionListener(this::txtUsrPasswordActionPerformed);
+
+        txtUsrRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "staff", "admin" }));
+
+        txtUsrStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "0" }));
+
+        javax.swing.GroupLayout pnlUsersLayout = new javax.swing.GroupLayout(pnlUsers);
+        pnlUsers.setLayout(pnlUsersLayout);
+        pnlUsersLayout.setHorizontalGroup(
+            pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUsersLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrID))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrUsername))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrPassword))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                        .addGap(0, 94, Short.MAX_VALUE)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                                .addComponent(btnUsrDeactivate, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnUsrClear, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                                .addComponent(btnUsrAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnUsrUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrRole, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addComponent(lblUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtUsrStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlUsersLayout.setVerticalGroup(
+            pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUsersLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)
+                    .addGroup(pnlUsersLayout.createSequentialGroup()
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsrStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnUsrUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUsrAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnUsrClear, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUsrDeactivate, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
+        );
+
+        paneTabs.addTab("User Management", pnlUsers);
 
         lblMainUser.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         lblMainUser.setForeground(new java.awt.Color(51, 51, 51));
@@ -640,7 +800,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnItmAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnItmAddActionPerformed
-        perform(() -> backend.addItem(txtItmCode.getText(), txtItemDescription.getText(),
+        perform(() -> backend.addItem(signedIn.id(), txtItmCode.getText(), txtItemDescription.getText(),
                 selectedCategoryId(), ((Number) txtItmMinStock.getValue()).intValue()), "Item added.");
     }//GEN-LAST:event_btnItmAddActionPerformed
 
@@ -651,8 +811,52 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTrxAddActionPerformed
 
     private void btnCtgAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCtgAddActionPerformed
-        perform(() -> backend.addCategory(txtCtgName.getText()), "Category added.");
+        perform(() -> backend.addCategory(signedIn.id(), txtCtgName.getText()), "Category added.");
     }//GEN-LAST:event_btnCtgAddActionPerformed
+
+    private void btnUsrAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrAddActionPerformed
+        if (!isAdmin()) return;
+        char[] password = txtUsrPassword.getPassword();
+        try {
+            backend.addUser(signedIn.id(), txtUsrUsername.getText(), password,
+                    (String) txtUsrRole.getSelectedItem(), "1".equals(txtUsrStatus.getSelectedItem()));
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User added. Give the password to the user privately.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
+        finally { java.util.Arrays.fill(password, '\0'); }
+    }//GEN-LAST:event_btnUsrAddActionPerformed
+
+    private void txtUsrPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsrPasswordActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUsrPasswordActionPerformed
+
+    private void btnUsrUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrUpdateActionPerformed
+        if (!isAdmin()) return;
+        char[] password = txtUsrPassword.getPassword();
+        try {
+            backend.updateUser(signedIn.id(), selectedUserId(), txtUsrUsername.getText(), password,
+                    (String) txtUsrRole.getSelectedItem(), "1".equals(txtUsrStatus.getSelectedItem()));
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User updated. If changed, share the new password privately.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
+        finally { java.util.Arrays.fill(password, '\0'); }
+    }//GEN-LAST:event_btnUsrUpdateActionPerformed
+
+    private void btnUsrDeactivateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrDeactivateActionPerformed
+        if (!isAdmin() || !confirm("Deactivate selected user?")) return;
+        try {
+            backend.deactivateUser(signedIn.id(), selectedUserId());
+            loadUsers();
+            clearUser();
+            javax.swing.JOptionPane.showMessageDialog(this, "User deactivated.");
+        } catch (java.sql.SQLException | IllegalArgumentException ex) { showError(ex.getMessage()); }
+    }//GEN-LAST:event_btnUsrDeactivateActionPerformed
+
+    private void btnUsrClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsrClearActionPerformed
+        clearUser();
+    }//GEN-LAST:event_btnUsrClearActionPerformed
 
     // Connect backend operations to the existing interface.
     // NetBeans-generated initComponents() and .form layouts above are unchanged.
@@ -667,19 +871,19 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         txtTrxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"IN", "OUT"}));
         txtRptReport.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Inventory", "Transactions"}));
 
-        btnItmUpdate.addActionListener(e -> perform(() -> backend.updateItem(itemRecordId(),
+        btnItmUpdate.addActionListener(e -> perform(() -> backend.updateItem(signedIn.id(), itemRecordId(),
                 txtItmCode.getText(), txtItemDescription.getText(), selectedCategoryId(),
                 ((Number) txtItmMinStock.getValue()).intValue()), "Item updated."));
         btnItmDeactivate.addActionListener(e -> {
             if (confirm("Deactivate this stock item?"))
-                perform(() -> backend.deactivateItem(itemRecordId()), "Item deactivated.");
+                perform(() -> backend.deactivateItem(signedIn.id(), itemRecordId()), "Item deactivated.");
         });
         btnItemClear.addActionListener(e -> clearItem());
-        btnCtgUpdate.addActionListener(e -> perform(() -> backend.updateCategory(categoryRecordId(),
+        btnCtgUpdate.addActionListener(e -> perform(() -> backend.updateCategory(signedIn.id(), categoryRecordId(),
                 txtCtgName.getText()), "Category updated."));
         btnCtgDeactivate.addActionListener(e -> {
             if (confirm("Delete this category? Only unused categories can be deleted."))
-                perform(() -> backend.deleteCategory(categoryRecordId()), "Category deleted.");
+                perform(() -> backend.deleteCategory(signedIn.id(), categoryRecordId()), "Category deleted.");
         });
         btnCtgClear.addActionListener(e -> clearCategory());
         btnTrxClear.addActionListener(e -> {
@@ -697,6 +901,9 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         });
         tblItems.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblItems.getSelectedRow() >= 0) selectItemRow();
+        });
+        tblItems1.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblItems1.getSelectedRow() >= 0) selectUserRow();
         });
         tblCategories.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tblCategories.getSelectedRow() >= 0) selectCategoryRow();
@@ -789,10 +996,44 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
                     backend.transactions());
             fillTable(tblAlerts, new String[]{"ID", "Code", "Description", "Category", "Quantity",
                     "Min Level"}, backend.lowStock());
-            loadReport();
+            if (isAdmin()) loadUsers();
+            if (isAdmin()) loadReport();
         } catch (java.sql.SQLException ex) {
             showError("Could not load inventory. Check your .env and MySQL setup.\n" + ex.getMessage());
         }
+    }
+
+    private boolean isAdmin() {
+        return signedIn != null && "admin".equalsIgnoreCase(signedIn.role());
+    }
+
+    private void loadUsers() throws java.sql.SQLException {
+        if (isAdmin()) fillTable(tblItems1,
+                new String[]{"ID", "Username", "Role", "Active"}, backend.users(signedIn.id()));
+    }
+
+    private int selectedUserId() {
+        try { return Integer.parseInt(txtUsrID.getText().trim()); }
+        catch (NumberFormatException ex) { throw new IllegalArgumentException("Select a user from the table."); }
+    }
+
+    private void selectUserRow() {
+        int row = tblItems1.convertRowIndexToModel(tblItems1.getSelectedRow());
+        javax.swing.table.TableModel m = tblItems1.getModel();
+        txtUsrID.setText(m.getValueAt(row, 0).toString());
+        txtUsrUsername.setText(m.getValueAt(row, 1).toString());
+        txtUsrRole.setSelectedItem(m.getValueAt(row, 2).toString());
+        txtUsrStatus.setSelectedItem(m.getValueAt(row, 3).toString());
+        txtUsrPassword.setText("");
+    }
+
+    private void clearUser() {
+        txtUsrID.setText("");
+        txtUsrUsername.setText("");
+        txtUsrPassword.setText("");
+        txtUsrRole.setSelectedItem("staff");
+        txtUsrStatus.setSelectedItem("1");
+        tblItems1.clearSelection();
     }
 
     private java.util.List<Object[]> categoryRows(java.util.List<BackendService.Choice> categories) {
@@ -897,12 +1138,17 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnTrxClear;
     private javax.swing.JButton btnTrxDeactivate;
     private javax.swing.JButton btnTrxUpdate;
+    private javax.swing.JButton btnUsrAdd;
+    private javax.swing.JButton btnUsrClear;
+    private javax.swing.JButton btnUsrDeactivate;
+    private javax.swing.JButton btnUsrUpdate;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JLabel lblCtgID;
     private javax.swing.JLabel lblCtgName;
     private javax.swing.JLabel lblItmCategory;
@@ -919,15 +1165,22 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblTrxQuantity;
     private javax.swing.JLabel lblTrxType;
     private javax.swing.JLabel lblTrxUser;
+    private javax.swing.JLabel lblUsrID;
+    private javax.swing.JLabel lblUsrPassword;
+    private javax.swing.JLabel lblUsrRole;
+    private javax.swing.JLabel lblUsrStatus;
+    private javax.swing.JLabel lblUsrUsername;
     private javax.swing.JTabbedPane paneTabs;
     private javax.swing.JPanel pnlAlerts;
     private javax.swing.JPanel pnlCategories;
     private javax.swing.JPanel pnlItems;
     private javax.swing.JPanel pnlReporting;
     private javax.swing.JPanel pnlTransactions;
+    private javax.swing.JPanel pnlUsers;
     private javax.swing.JTable tblAlerts;
     private javax.swing.JTable tblCategories;
     private javax.swing.JTable tblItems;
+    private javax.swing.JTable tblItems1;
     private javax.swing.JTable tblReporting;
     private javax.swing.JTable tblTransactions;
     private javax.swing.JTextField txtCtgID;
@@ -944,5 +1197,10 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
     private javax.swing.JSpinner txtTrxQuantity;
     private javax.swing.JComboBox<String> txtTrxType;
     private javax.swing.JTextField txtTrxUser;
+    private javax.swing.JTextField txtUsrID;
+    private javax.swing.JPasswordField txtUsrPassword;
+    private javax.swing.JComboBox<String> txtUsrRole;
+    private javax.swing.JComboBox<String> txtUsrStatus;
+    private javax.swing.JTextField txtUsrUsername;
     // End of variables declaration//GEN-END:variables
 }
