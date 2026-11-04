@@ -146,6 +146,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Stock Inventory Management System");
+        setResizable(false);
 
         lblMainTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblMainTitle.setForeground(new java.awt.Color(51, 51, 51));
@@ -337,7 +338,7 @@ public class MainDashBoardFrame extends javax.swing.JFrame {
         lblTrxQuantity.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTrxQuantity.setText("Quantity:");
 
-        btnTrxAdd.setText("Post");
+        btnTrxAdd.setText("Add");
         btnTrxAdd.addActionListener(this::btnTrxAddActionPerformed);
 
         btnTrxUpdate.setText("Update");
